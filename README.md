@@ -1,6 +1,12 @@
 # phonepiece
 
-phonepiece is library to manage phone inventories, it also has a few linguistic/phonetics tools 
+phonepiece is library to manage phone inventories, it also has a few linguistic/phonetics tools.
+
+It is mainly intended to be used in the following projects, but it can be used as a standalone library
+
+- [allosaurus](https://github.com/xinjli/allosaurus): phone recognition toolkit
+- [transphone](https://github.com/xinjli/transphone): grapheme-to-phoneme toolkit
+- [asr2k](https://github.com/xinjli/asr2k): speech recognition systems for 2000 languages
 
 ## Usage
 
@@ -81,13 +87,13 @@ defaultdict(list,
 
 ## Models
 
-| model | # languages |                              description                               |
-| :----: |:-----------:|:----------------------------------------------------------------------:|
-| phoible |     ~2k     | phone/phoneme databases extracted from [Phoible](https://phoible.org/) |
-| latest | ~8k |     Phoible database + estimated inventory based on reference [2]      |
+| model | # supported languages |                                                                          description                                                                          |
+| :----: |:---------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| phoible |          ~2k          | phone/phoneme databases extracted from [Phoible](https://phoible.org/) [1]. Allophone information is from [Allovera](https://github.com/dmort27/allovera) [3] |
+| latest |          ~8k          |                                               Phoible database + estimated inventory based on our LREC work [2]                                               |
 
 ## Reference
 
-[1] Moran, Steven, Daniel McCloy, and Richard Wright. "PHOIBLE online." (2014).
-
-[2] Li, Xinjian, et al. "Phone Inventories and Recognition for Every Language" LREC 2022. 2022
+- [1] Moran, Steven, Daniel McCloy, and Richard Wright. "PHOIBLE online." (2014).
+- [2] Li, Xinjian, et al. "Phone Inventories and Recognition for Every Language" LREC 2022. 2022
+- [3] Mortensen, David R., et al. "AlloVera: A Multilingual Allophone Database." Proceedings of the 12th Language Resources and Evaluation Conference. 2020.
