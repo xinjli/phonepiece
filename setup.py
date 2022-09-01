@@ -2,7 +2,7 @@ from setuptools import setup,find_packages
 
 setup(
    name='phonepiece',
-   version='1.0',
+   version='1.0.1',
    description='a multilingual phone tokenizer',
    author='Xinjian Li',
    author_email='xinjianl@cs.cmu.edu',
