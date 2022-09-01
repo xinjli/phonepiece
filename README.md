@@ -8,6 +8,19 @@ It is mainly intended to be used in the following projects, but it can be used a
 - [transphone](https://github.com/xinjli/transphone): grapheme-to-phoneme toolkit
 - [asr2k](https://github.com/xinjli/asr2k): speech recognition systems for 2000 languages
 
+## Install
+
+Allosaurus is available from pip
+
+```bash
+pip install phonepiece
+```
+You can also clone this repository and install
+
+```bash
+python setup.py install
+```
+
 ## Usage
 
 The main feature of phonepiece is to look-up inventory.
