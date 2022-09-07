@@ -10,7 +10,7 @@ It is mainly intended to be used in the following projects, but it can be used a
 
 ## Install
 
-Allosaurus is available from pip
+phonepiece is available from pip
 
 ```bash
 pip install phonepiece
