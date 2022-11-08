@@ -17,6 +17,10 @@ def read_inventory(lang_id, model_name='latest'):
     :rtype:
     """
 
+    # windows does not allow prn and con directory name
+    if lang_id in ['prn', 'con']:
+        lang_id = '_' + lang_id
+
     # check whether a customized path is used or not
     if (Path(model_name) / lang_id).exists():
         lang_dir = Path(model_name) / lang_id
