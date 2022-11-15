@@ -38,6 +38,7 @@ def read_inventory(lang_id, model_name='latest'):
     phone_unit = read_unit(lang_dir / 'phone.txt')
     phoneme_unit = read_unit(lang_dir / 'phoneme.txt')
     phone2phoneme = defaultdict(list)
+    phoneme2phone = defaultdict(list)
 
     # use allophone file if allovera supports it
     for line in open(lang_dir / 'allophone.txt', encoding='utf-8'):
@@ -46,12 +47,16 @@ def read_inventory(lang_id, model_name='latest'):
 
         for phone in fields[1:]:
             phone2phoneme[phone].append(phoneme)
+            phoneme2phone[phoneme].append(phone)
 
     # blk and eos would be considered as phone/phonemes as well
     phone2phoneme['<blk>'] = ['<blk>']
     phone2phoneme['<eos>'] = ['<eos>']
+    phoneme2phone['<blk>'] = ['<blk>']
+    phoneme2phone['<eos>'] = ['<eos>']
 
-    return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme)
+
+    return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
 
 
 def write_inventory(inv, inv_path):
@@ -91,11 +96,12 @@ def is_inventory_available(lang_id, model_name='latest'):
 
 class Inventory:
 
-    def __init__(self, lang_id, model_name, phoneme, phone, phone2phoneme):
+    def __init__(self, lang_id, model_name, phoneme, phone, phone2phoneme, phoneme2phone):
         self.lang_id = lang_id
         self.phoneme = phoneme
         self.phone = phone
         self.phone2phoneme = phone2phoneme
+        self.phoneme2phone = phoneme2phone
 
         self.articulatory = None
         self.nearest_mapping = dict()
