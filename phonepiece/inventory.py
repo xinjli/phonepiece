@@ -2,6 +2,7 @@ from phonepiece.config import *
 from phonepiece.unit import read_unit, write_unit
 from phonepiece.articulatory import *
 from phonepiece.bin.download_model import download_model
+from phonepiece.iso import normalize_lang_id
 import json
 from collections import defaultdict
 
@@ -10,12 +11,15 @@ def read_inventory(lang_id, model_name='latest'):
     """
     read inventory of the lang_id from a prebuilt inventory model or a customized local path
 
-    :param lang_id: a 3 char iso id
+    :param lang_id: a 3 char or 2 char iso id
     :param model_name: model name or a customized path
     :type lang_id_or_path:
     :return:
     :rtype:
     """
+
+    # normalize language id (e.g: 2 char 639-1 -> 3 char 639-3)
+    lang_id = normalize_lang_id(lang_id)
 
     # windows does not allow the following directory name, which coincides with language id
     # we give them a _ prefix to avoid naming issue on windows
