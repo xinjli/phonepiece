@@ -120,6 +120,14 @@ class Inventory:
 
         return remapped_phonemes
 
+    def validate(self, phonemes):
+        for phoneme in phonemes:
+            if phoneme not in self.phoneme:
+                print("phoneme ", phoneme, " not in phoneme inventory!")
+                return False
+
+        return True
+
     def get_nearest_phoneme(self, phoneme):
         """
         map a random phoneme (may not exist in the inventory) to the nearest phoneme in the inventory.
