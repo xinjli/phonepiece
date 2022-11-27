@@ -50,6 +50,9 @@ class Articulatory:
 
     def most_similar(self, target_phone, phone_cands):
 
+        if target_phone in phone_cands:
+            return target_phone
+
         max_phone = None
         max_score = -1000000
 
