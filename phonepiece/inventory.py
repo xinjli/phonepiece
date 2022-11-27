@@ -1,11 +1,9 @@
 from phonepiece.config import *
 from phonepiece.unit import read_unit, write_unit
 from phonepiece.articulatory import *
-from phonepiece.bin.download_model import download_model
 from phonepiece.iso import normalize_lang_id
-import json
 from collections import defaultdict
-
+from phonepiece.utils import load_lang_dir
 
 def read_inventory(lang_id, model_name='latest'):
     """
@@ -21,23 +19,8 @@ def read_inventory(lang_id, model_name='latest'):
     # normalize language id (e.g: 2 char 639-1 -> 3 char 639-3)
     lang_id = normalize_lang_id(lang_id)
 
-    # windows does not allow the following directory name, which coincides with language id
-    # we give them a _ prefix to avoid naming issue on windows
-    if lang_id in ['prn', 'con', 'aux', 'null']:
-        lang_id = '_' + lang_id
-
-    # check whether a customized path is used or not
-    if (Path(model_name) / lang_id).exists():
-        lang_dir = Path(model_name) / lang_id
-    else:
-        lang_dir = PhonePieceConfig.data_path / 'model' / model_name / lang_id
-
-        # if not exists, we try to download the model
-        if not lang_dir.exists():
-            download_model(model_name)
-
-        if not lang_dir.exists():
-            raise ValueError(f"could not download or read {model_name} inventory")
+    # load or download lang dir
+    lang_dir = load_lang_dir(lang_id, model_name)
 
     phone_unit = read_unit(lang_dir / 'phone.txt')
     phoneme_unit = read_unit(lang_dir / 'phoneme.txt')
@@ -58,7 +41,6 @@ def read_inventory(lang_id, model_name='latest'):
     phone2phoneme['<eos>'] = ['<eos>']
     phoneme2phone['<blk>'] = ['<blk>']
     phoneme2phone['<eos>'] = ['<eos>']
-
 
     return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
 
@@ -109,6 +91,7 @@ class Inventory:
 
         self.articulatory = None
         self.nearest_mapping = dict()
+        self.phone_nearest_mapping = dict()
 
     def __str__(self):
         return f"<Inventory {self.lang_id} phoneme: {len(self.phoneme)}, phone: {len(self.phone)}>"
@@ -116,13 +99,26 @@ class Inventory:
     def __repr__(self):
         return self.__str__()
 
-    def remap(self, phonemes):
+    def remap(self, phonemes_or_phones, broad=True):
 
-        remapped_phonemes = []
-        for phoneme in phonemes:
-            remapped_phonemes.append(self.get_nearest_phoneme(phoneme))
+        remapped_phones = []
 
-        return remapped_phonemes
+        if broad:
+            for phoneme in phonemes_or_phones:
+                remapped_phones.append(self.get_nearest_phoneme(phoneme))
+        else:
+            for phone in phonemes_or_phones:
+                remapped_phones.append(self.get_nearest_phone(phone))
+
+        return remapped_phones
+
+    def phone_to_phoneme(self, phones):
+        result = []
+        for phone in phones:
+            phonemes = self.phone2phoneme[phone]
+            result.append(phonemes[0])
+
+        return result
 
     def validate(self, phonemes):
         for phoneme in phonemes:
@@ -131,6 +127,36 @@ class Inventory:
                 return False
 
         return True
+
+    def get_nearest_phone(self, phone):
+        """
+        map a random phone (may not exist in the inventory) to the nearest phone in the inventory.
+        The decision is based on the articulatory distance
+
+        :param phone: a random phone
+        :type phone: str
+        :return: nearest phone
+        :rtype: str
+        """
+
+        if self.articulatory is None:
+            self.articulatory = Articulatory()
+
+        # special handling for :
+        if phone.endswith('ː') and phone[:-1] in self.phone.unit_to_id:
+            self.phone_nearest_mapping[phone] = phone[:-1]
+            return phone[:-1]
+
+        if phone in self.phone_nearest_mapping:
+            nearest_phone = self.phone_nearest_mapping[phone]
+
+        else:
+
+            target_phones = list(self.phone.unit_to_id.keys())[1:-1]
+            nearest_phone = self.articulatory.most_similar(phone, target_phones)
+            self.phone_nearest_mapping[phone] = nearest_phone
+
+        return nearest_phone
 
     def get_nearest_phoneme(self, phoneme):
         """

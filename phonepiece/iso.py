@@ -1,11 +1,16 @@
 from iso639 import languages
 
-# map macro lang to its individual lang with the largest population
+# map macro lang to its individual lang with the largest population or simply the first child entry on Wikipedia
 _macro_to_individual = {
     'zho': 'cmn',
     'ara': 'arb',
     'aze': 'azb',
     'fas': 'pes',
+    'msa': 'zlm',
+    'ori': 'ory',
+    'kok': 'gom',
+    'srd': 'sro',
+    'est': 'ekk'
 }
 
 def normalize_lang_id(lang_id):
