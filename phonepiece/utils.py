@@ -1,5 +1,4 @@
 from phonepiece.config import *
-from phonepiece.articulatory import *
 from phonepiece.bin.download_model import download_model
 from phonepiece.iso import normalize_lang_id
 

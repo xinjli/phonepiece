@@ -1,9 +1,10 @@
 from phonepiece.config import *
 from phonepiece.unit import read_unit, write_unit
-from phonepiece.articulatory import *
+from phonepiece.ipa import ipa
 from phonepiece.iso import normalize_lang_id
 from collections import defaultdict
 from phonepiece.utils import load_lang_dir
+
 
 def read_inventory(lang_id, model_name='latest'):
     """
@@ -89,7 +90,7 @@ class Inventory:
         self.phone2phoneme = phone2phoneme
         self.phoneme2phone = phoneme2phone
 
-        self.articulatory = None
+        self.ipa = ipa
         self.nearest_mapping = dict()
         self.phone_nearest_mapping = dict()
 
@@ -128,7 +129,7 @@ class Inventory:
 
         return True
 
-    def get_nearest_phone(self, phone):
+    def get_nearest_phone(self, phone, verbose=False):
         """
         map a random phone (may not exist in the inventory) to the nearest phone in the inventory.
         The decision is based on the articulatory distance
@@ -138,9 +139,6 @@ class Inventory:
         :return: nearest phone
         :rtype: str
         """
-
-        if self.articulatory is None:
-            self.articulatory = Articulatory()
 
         # special handling for :
         if phone.endswith('ː') and phone[:-1] in self.phone.unit_to_id:
@@ -153,7 +151,7 @@ class Inventory:
         else:
 
             target_phones = list(self.phone.unit_to_id.keys())[1:-1]
-            nearest_phone = self.articulatory.most_similar(phone, target_phones)
+            nearest_phone = self.ipa.most_similar(phone, target_phones, verbose=verbose)
             self.phone_nearest_mapping[phone] = nearest_phone
 
         return nearest_phone
@@ -169,9 +167,6 @@ class Inventory:
         :rtype: str
         """
 
-        if self.articulatory is None:
-            self.articulatory = Articulatory()
-
         # special handling for :
         if phoneme.endswith('ː') and phoneme[:-1] in self.phoneme.unit_to_id:
             self.nearest_mapping[phoneme] = phoneme[:-1]
@@ -183,7 +178,7 @@ class Inventory:
         else:
 
             target_phonemes = list(self.phoneme.unit_to_id.keys())[1:-1]
-            nearest_phoneme = self.articulatory.most_similar(phoneme, target_phonemes)
+            nearest_phoneme = self.ipa.most_similar(phoneme, target_phonemes)
             self.nearest_mapping[phoneme] = nearest_phoneme
 
         return nearest_phoneme

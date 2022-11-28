@@ -1,5 +1,6 @@
 import platform
 from pathlib import Path
+import logging
 
 
 class PhonePieceConfig:
@@ -9,3 +10,5 @@ class PhonePieceConfig:
     # data path
     data_path = root_path / 'data'
     data_str = str(data_path)
+
+    logger = logging.getLogger('phonepiece')

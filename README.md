@@ -105,6 +105,17 @@ defaultdict(list,
 | phoible |          ~2k          | phone/phoneme databases extracted from [Phoible](https://phoible.org/) [1]. Allophone information is from [Allovera](https://github.com/dmort27/allovera) [3] |
 | latest |          ~8k          |                                               Phoible database + estimated inventory based on our LREC work [2]                                               |
 
+
+## Acknowledgement
+
+This repository use code/data from the following repository
+
+- [epitran](https://github.com/dmort27/epitran)
+- [panphon](https://github.com/dmort27/panphon)
+- [allovera](https://github.com/dmort27/allovera)
+- [phoible](https://github.com/phoible/dev)
+- [wikipron](https://github.com/CUNY-CL/wikipron)
+
 ## Reference
 
 - [1] Moran, Steven, Daniel McCloy, and Richard Wright. "PHOIBLE online." (2014).

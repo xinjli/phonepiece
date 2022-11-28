@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 # this file is adapted from epitran
 
-import io
-import logging
-import unicodedata
 import csv
-import regex as re
 from phonepiece.config import PhonePieceConfig
-from phonepiece.segmenter import PhoneSegmenter
 
 
 def none2str(x):

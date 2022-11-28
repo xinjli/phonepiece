@@ -7,7 +7,7 @@ import unicodedata
 
 import regex as re
 from phonepiece.config import PhonePieceConfig
-from phonepiece.segmenter import PhoneSegmenter
+from phonepiece.ipa import ipa
 
 
 def none2str(x):
@@ -19,11 +19,11 @@ class PinyinConverter:
     def __init__(self):
         rule_path = PhonePieceConfig.data_path / 'pinyin2ipa.txt'
         self.rules = PinyinRules([rule_path])
-        self.segmentor = PhoneSegmenter()
+        self.ipa = ipa
 
     def convert(self, text):
         pinyin = self.rules.apply(text)
-        return self.segmentor.segment(pinyin)
+        return self.ipa.tokenize(pinyin)
 
 
 class RuleFileError(Exception):

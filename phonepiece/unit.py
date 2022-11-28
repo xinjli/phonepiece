@@ -1,5 +1,5 @@
 import numpy as np
-from phonepiece.articulatory import Articulatory
+from phonepiece.ipa import ipa
 
 
 def read_unit(unit_path):
@@ -80,7 +80,7 @@ class Unit:
 
         self.elems = list(self.id_to_unit.values())
 
-        self.articulatory = None
+        self.ipa = ipa
         self.nearest_mapping = None
 
     def __str__(self):
@@ -220,9 +220,6 @@ class Unit:
 
     def get_nearest_phoneme(self, unit):
 
-        if self.articulatory is None:
-            self.articulatory = Articulatory()
-
         if self.nearest_mapping is None:
             self.nearest_mapping = dict()
 
@@ -239,7 +236,7 @@ class Unit:
             return unit[:-1]
 
         target_unit = list(self.unit_to_id.keys())[1:-1]
-        nearest_unit = self.articulatory.most_similar(unit, target_unit)
+        nearest_unit = self.ipa.most_similar(unit, target_unit)
         self.nearest_mapping[unit] = nearest_unit
 
         return nearest_unit
