@@ -1,5 +1,7 @@
 # phonepiece
 
+![CI Test](https://github.com/xinjli/phonepiece/actions/workflows/python.yml/badge.svg)
+
 `phonepiece` is library to manage phone inventories, it also has a few linguistic/phonetics tools.
 
 It is mainly intended to be used in the following projects, but it can be used as a standalone library
