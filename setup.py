@@ -4,7 +4,7 @@ requirements=[r.strip() for r in open("requirements.txt").readlines()]
 
 setup(
    name='phonepiece',
-   version='1.2.2',
+   version='1.2.3',
    description='a multilingual phone tokenizer',
    author='Xinjian Li',
    author_email='xinjianl@cs.cmu.edu',

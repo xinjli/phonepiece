@@ -10,6 +10,14 @@ _norm_rules = [
     ('d̥', "t"),
     ("b̥", "b"),
     ("'", "ʼ"),
+    ("I", "ɪ"),
+    ('O', 'o'),
+    ('Y', 'ʏ'),
+    ('ɚ', 'ə˞'),
+    ('ɝ', 'ɜ˞'),
+    ('ә', 'ə'),
+    ('ˈ', ''),
+
 ]
 
 
@@ -82,9 +90,9 @@ class IPA:
         if len(norm_phone) > 2 and norm_phone[1:-1] in self.phone2feature:
             return norm_phone[1:-1]
 
-        # give up ... and return [!] as an invalid phone to debug
+        # give up ... and return empty as an invalid phone to debug
         PhonePieceConfig.logger.error(f"cannot normalize phone {orig_phone}")
-        return '!'
+        return ''
 
     def tokenize(self, orig_phone):
         norm_phone = unicodedata.normalize('NFD', orig_phone)
@@ -134,7 +142,7 @@ class IPA:
 
         return np.sum((f1 == f2) * self.weights) / np.sum(self.weights)
 
-    def most_similar(self, target_phone, phone_cands):
+    def most_similar(self, target_phone, phone_cands, verbose=False):
 
         max_phone = phone_cands[0]
         max_score = -1000000
