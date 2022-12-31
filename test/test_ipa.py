@@ -17,6 +17,8 @@ class TestIPA(unittest.TestCase):
         self.assertTrue(ipa.similarity('a', 'a') == 1.0)
         self.assertTrue(ipa.similarity('g', 'q̠') == 1.0)
         self.assertTrue(ipa.similarity('a', 'e') > ipa.similarity('a', 'b'))
+        self.assertTrue(ipa.similarity('a', 'ɑ') > ipa.similarity('a', 'i'))
+        self.assertTrue(ipa.similarity('a', 'ɑ') > ipa.similarity('ɑ', 'i'))
 
         # most similar
         self.assertTrue(ipa.most_similar('a', ['b', 's', 'r', 'e']) == 'e')

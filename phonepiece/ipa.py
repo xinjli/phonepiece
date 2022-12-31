@@ -20,7 +20,6 @@ _norm_rules = [
 
 ]
 
-
 def read_ipa():
 
     feature_file = PhonePieceConfig.data_path / f'ipa_all.csv'
@@ -140,12 +139,12 @@ class IPA:
         f1 = self.phone2feature[p1]
         f2 = self.phone2feature[p2]
 
-        return np.sum((f1 == f2) * self.weights) / np.sum(self.weights)
+        return 1.0 - np.sum(np.abs(f1 - f2) * self.weights) / np.sum(self.weights) / 2.0
 
     def most_similar(self, target_phone, phone_cands, verbose=False):
 
         max_phone = phone_cands[0]
-        max_score = -1000000
+        min_distance = 1000000
 
         if target_phone in phone_cands:
             return target_phone
@@ -158,18 +157,16 @@ class IPA:
 
         target_feature = self.phone2feature[target_phone]
 
-        weight_sum = np.sum(self.weights)
-
         for orig_phone in phone_cands:
             phone = self.normalize(orig_phone)
 
             if phone in self.phone2feature:
                 cand_feature = self.phone2feature[phone]
-                score = np.sum((target_feature == cand_feature) * self.weights) / weight_sum
+                distance = np.sum(np.abs(target_feature-cand_feature) * self.weights)
 
-                if score > max_score:
+                if distance < min_distance:
                     max_phone = orig_phone
-                    max_score = score
+                    min_distance = distance
 
         return max_phone
 
