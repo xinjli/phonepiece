@@ -11,7 +11,8 @@ class TestIPA(unittest.TestCase):
         self.assertTrue(ipa.normalize('a') == 'a')
         self.assertTrue(ipa.normalize('a:') == 'aː')
         self.assertTrue(ipa.normalize('b') == 'b')
-        self.assertTrue(ipa.normalize('g') == 'q̠')
+        self.assertTrue(ipa.normalize('g') == 'q')
+        self.assertTrue(ipa.normalize('d̠') == 'd')
 
         # score
         self.assertTrue(ipa.similarity('a', 'a') == 1.0)

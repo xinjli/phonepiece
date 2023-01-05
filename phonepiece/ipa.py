@@ -2,6 +2,7 @@ import numpy as np
 from phonepiece.config import PhonePieceConfig
 import csv
 import unicodedata
+from collections import defaultdict
 
 _norm_rules = [
     (':', 'ː'),
@@ -47,14 +48,30 @@ def read_ipa():
 
     assert len(weights) == 24
 
-    return IPA(phone2feature, weights)
+    base_phone_file = PhonePieceConfig.data_path / f'ipa_base.csv'
+    base_phones = []
+    with open(base_phone_file) as csvfile:
+        reader = csv.reader(csvfile)
+
+        # This skips the first row of the CSV file.
+        next(reader)
+
+        for row in reader:
+            phone = unicodedata.normalize('NFD', row[0])
+            base_phones.append(phone)
+
+    return IPA(phone2feature, weights, set(base_phones))
 
 
 class IPA:
 
-    def __init__(self, phone2feature, weights):
+    def __init__(self, phone2feature, weights, base_phones):
         self.phone2feature = phone2feature
         self.weights = weights
+        self.base_phones = base_phones
+
+        self.canonical_phone = {}
+        self.compute_canoncial_form()
 
     def __getitem__(self, item):
         item = self.normalize(item)
@@ -67,6 +84,44 @@ class IPA:
         item = self.normalize(item)
         return item in self.phone2feature
 
+    def compute_canoncial_form(self):
+        phone_idx = defaultdict(list)
+
+        power = np.array([2**i for i in range(24)])
+        for phone, feat in self.phone2feature.items():
+            idx = np.sum((feat + 2)*power)
+            phone_idx[idx].append(phone)
+
+        for _, phones in phone_idx.items():
+            if len(phones) == 1:
+                self.canonical_phone[phones[0]] = phones[0]
+            else:
+                canonical_form = None
+
+                # identify the canoncial form by
+                # checking whether it is in the base phones
+                # otherwise pick up the min length phone
+                min_length = 100
+                min_phone = None
+
+                for phone in phones:
+                    if phone in self.base_phones:
+                        canonical_form = phone
+                        break
+                    else:
+                        if len(phone) < min_length:
+                            min_length = len(phone)
+                            min_phone = phone
+
+
+                if canonical_form is None:
+                    canonical_form = min_phone
+
+                assert canonical_form is not None
+                for phone in phones:
+                    self.canonical_phone[phone] = canonical_form
+
+
     def normalize(self, orig_phone):
         norm_phone = unicodedata.normalize('NFD', orig_phone)
 
@@ -78,16 +133,17 @@ class IPA:
         # strip diacritics until it find match
         while len(phone) > 0:
             if phone in self.phone2feature:
-                return phone
+                return self.canonical_phone[phone]
             phone = phone[:-1]
 
         # guard cases such as: ʰk
         if len(norm_phone) > 1 and norm_phone[1:] in self.phone2feature:
-            return norm_phone[1:]
+            return self.canonical_phone[norm_phone[1:]]
 
         # guard cases such as ʰkʷ
         if len(norm_phone) > 2 and norm_phone[1:-1] in self.phone2feature:
-            return norm_phone[1:-1]
+            return self.canonical_phone[norm_phone[1:-1]]
+
 
         # give up ... and return empty as an invalid phone to debug
         PhonePieceConfig.logger.error(f"cannot normalize phone {orig_phone}")

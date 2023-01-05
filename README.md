@@ -25,6 +25,8 @@ python setup.py install
 
 ## Usage
 
+### Inventory Lookup
+
 The main feature of phonepiece is to look-up inventory.
 
 An inventory contains the following information:
@@ -98,6 +100,22 @@ defaultdict(list,
              'θ': ['θ'],
              '<blk>': ['<blk>'],
              '<eos>': ['<eos>']})
+```
+
+### Phonetics Utilities
+
+This lib also provides a few phonetics utilities, for example, IPA manipulations
+
+```python
+In [1]: from phonepiece.ipa import read_ipa                                                         
+
+In [2]: ipa = read_ipa()                                                                            
+
+In [3]: ipa.tokenize('kʰæt')                                                                        
+Out[3]: ['kʰ', 'æ', 't']
+
+In [4]: ipa.similarity('a', 'e')                                                                    
+Out[4]: 0.9655172413793104
 ```
 
 ## Models
