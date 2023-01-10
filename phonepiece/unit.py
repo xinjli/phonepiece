@@ -1,5 +1,5 @@
 import numpy as np
-from phonepiece.ipa import ipa
+from phonepiece.ipa import read_ipa
 
 
 def read_unit(unit_path):
@@ -75,12 +75,13 @@ class Unit:
 
         assert '<blk>' in self.unit_to_id and self.unit_to_id['<blk>'] == 0
 
+        self.elems = [None for i in range(len(self.unit_to_id))]
+
         for unit, idx in self.unit_to_id.items():
             self.id_to_unit[idx] = unit
+            self.elems[idx] = unit
 
-        self.elems = list(self.id_to_unit.values())
-
-        self.ipa = ipa
+        self.ipa = read_ipa()
         self.nearest_mapping = None
 
     def __str__(self):
@@ -112,6 +113,8 @@ class Unit:
         """
         return set(self.unit_to_id.keys()) == set(other.unit_to_id.keys())
 
+    def tolist(self):
+        return self.elems
 
     def atoi(self, inputs):
         if isinstance(inputs, list):

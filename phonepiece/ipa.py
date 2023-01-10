@@ -21,7 +21,14 @@ _norm_rules = [
 
 ]
 
+# singleton
+ipa = None
+
 def read_ipa():
+    global ipa
+
+    if ipa is not None:
+        return ipa
 
     feature_file = PhonePieceConfig.data_path / f'ipa_all.csv'
 
@@ -60,7 +67,8 @@ def read_ipa():
             phone = unicodedata.normalize('NFD', row[0])
             base_phones.append(phone)
 
-    return IPA(phone2feature, weights, set(base_phones))
+    ipa = IPA(phone2feature, weights, set(base_phones))
+    return ipa
 
 
 class IPA:
@@ -83,6 +91,10 @@ class IPA:
     def __contains__(self, item):
         item = self.normalize(item)
         return item in self.phone2feature
+
+
+    def read_feature(self, item):
+        return self.__getitem__(item)
 
     def compute_canoncial_form(self):
         phone_idx = defaultdict(list)
@@ -225,6 +237,3 @@ class IPA:
                     min_distance = distance
 
         return max_phone
-
-
-ipa = read_ipa()

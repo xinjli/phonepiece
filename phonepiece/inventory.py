@@ -1,12 +1,11 @@
 from phonepiece.config import *
 from phonepiece.unit import read_unit, write_unit
-from phonepiece.ipa import ipa
+from phonepiece.ipa import read_ipa
 from phonepiece.iso import normalize_lang_id
 from collections import defaultdict
 from phonepiece.utils import load_lang_dir
 
-
-def read_inventory(lang_id, model_name='latest'):
+def read_inventory(lang_id_or_path, model_name='latest'):
     """
     read inventory of the lang_id from a prebuilt inventory model or a customized local path
 
@@ -17,11 +16,18 @@ def read_inventory(lang_id, model_name='latest'):
     :rtype:
     """
 
+    if Path(lang_id_or_path).exists():
+        lang_dir = Path(lang_id_or_path)
+        lang_id = lang_dir.stem
+    else:
+        # load or download lang dir
+        assert len(lang_id_or_path) == 2 or len(lang_id_or_path) == 3
+
+        lang_id = lang_id_or_path
+        lang_dir = load_lang_dir(lang_id, model_name)
+
     # normalize language id (e.g: 2 char 639-1 -> 3 char 639-3)
     lang_id = normalize_lang_id(lang_id)
-
-    # load or download lang dir
-    lang_dir = load_lang_dir(lang_id, model_name)
 
     phone_unit = read_unit(lang_dir / 'phone.txt')
     phoneme_unit = read_unit(lang_dir / 'phoneme.txt')
@@ -90,7 +96,7 @@ class Inventory:
         self.phone2phoneme = phone2phoneme
         self.phoneme2phone = phoneme2phone
 
-        self.ipa = ipa
+        self.ipa = read_ipa()
         self.nearest_mapping = dict()
         self.phone_nearest_mapping = dict()
 
@@ -106,9 +112,14 @@ class Inventory:
 
         if broad:
             for phoneme in phonemes_or_phones:
+                if phoneme is None or len(phoneme.strip()) == 0:
+                    continue
+
                 remapped_phones.append(self.get_nearest_phoneme(phoneme))
         else:
             for phone in phonemes_or_phones:
+                if phone is None or len(phone.strip()) == 0:
+                    continue
                 remapped_phones.append(self.get_nearest_phone(phone))
 
         return remapped_phones
