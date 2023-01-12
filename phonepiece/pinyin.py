@@ -7,7 +7,7 @@ import unicodedata
 
 import regex as re
 from phonepiece.config import PhonePieceConfig
-from phonepiece.ipa import ipa
+from phonepiece.ipa import read_ipa
 
 
 def none2str(x):
@@ -19,7 +19,7 @@ class PinyinConverter:
     def __init__(self):
         rule_path = PhonePieceConfig.data_path / 'pinyin2ipa.txt'
         self.rules = PinyinRules([rule_path])
-        self.ipa = ipa
+        self.ipa = read_ipa()
 
     def convert(self, text):
         pinyin = self.rules.apply(text)
