@@ -5,6 +5,7 @@ import unicodedata
 import csv
 from phonepiece.utils import load_lang_dir
 import re
+from phonepiece.ipa import read_ipa
 
 
 def read_epitran_g2p(lang_id_or_g2p_id, writing_system=None):
@@ -41,6 +42,8 @@ def read_epitran_g2p(lang_id_or_g2p_id, writing_system=None):
 
     g2p = defaultdict(list)
 
+    ipa = read_ipa()
+
     with open(g2p_path, encoding='utf-8') as f:
         reader = csv.reader(f)
         orth, phon = next(reader)
@@ -48,12 +51,15 @@ def read_epitran_g2p(lang_id_or_g2p_id, writing_system=None):
             raise DatafileError(f'Header is ["{orth}", "{phon}"] instead of ["Orth", "Phon"].')
         for (i, fields) in enumerate(reader):
             try:
-                graph, phon = fields
+                graph, phons = fields
             except ValueError as malformed_data_file:
                 raise DatafileError(f'Map file is not well formed at line {i + 2}.') from malformed_data_file
-            graph = unicodedata.normalize('NFD', graph)
-            phon = unicodedata.normalize('NFD', phon)
-            phon = re.sub('[˩˨˧˦˥]', '', phon)
-            g2p[graph].append(phon)
+
+            phons = ipa.tokenize(phons)
+            for phon in phons:
+                graph = unicodedata.normalize('NFC', graph)
+                phon = unicodedata.normalize('NFC', phon)
+                phon = re.sub('[˩˨˧˦˥]', '', phon)
+                g2p[graph].append(phon)
 
     return g2p

@@ -106,21 +106,35 @@ class Inventory:
     def __repr__(self):
         return self.__str__()
 
-    def remap(self, phonemes_or_phones, broad=True):
+    def remap(self, phonemes_or_phones, broad=True, verbose=False):
 
         remapped_phones = []
+
+        if not isinstance(phonemes_or_phones, list):
+            phonemes_or_phones = self.ipa.tokenize(phonemes_or_phones)
 
         if broad:
             for phoneme in phonemes_or_phones:
                 if phoneme is None or len(phoneme.strip()) == 0:
                     continue
 
-                remapped_phones.append(self.get_nearest_phoneme(phoneme))
+                nearest_phoneme = self.get_nearest_phoneme(phoneme)
+
+                if verbose:
+                    print(f"{phoneme} -> nearest phoneme {nearest_phoneme}")
+
+                remapped_phones.append(nearest_phoneme)
         else:
             for phone in phonemes_or_phones:
                 if phone is None or len(phone.strip()) == 0:
                     continue
-                remapped_phones.append(self.get_nearest_phone(phone))
+
+                nearest_phone = self.get_nearest_phone(phone)
+
+                if verbose:
+                    print(f"{phone} -> nearest phone {nearest_phone}")
+
+                remapped_phones.append(nearest_phone)
 
         return remapped_phones
 

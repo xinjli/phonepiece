@@ -18,7 +18,8 @@ _norm_rules = [
     ('ɝ', 'ɜ˞'),
     ('ә', 'ə'),
     ('ˈ', ''),
-
+    ('tʃ', 't͡ʃ'),
+    ('dʒ','d͡ʒ'),
 ]
 
 # singleton
@@ -155,7 +156,6 @@ class IPA:
         # guard cases such as ʰkʷ
         if len(norm_phone) > 2 and norm_phone[1:-1] in self.phone2feature:
             return self.canonical_phone[norm_phone[1:-1]]
-
 
         # give up ... and return empty as an invalid phone to debug
         PhonePieceConfig.logger.error(f"cannot normalize phone {orig_phone}")
