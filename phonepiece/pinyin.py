@@ -8,7 +8,7 @@ import unicodedata
 import regex as re
 from phonepiece.config import PhonePieceConfig
 from phonepiece.ipa import read_ipa
-
+from phonepiece.inventory import read_inventory
 
 def none2str(x):
     return x if x else ''
@@ -20,10 +20,13 @@ class PinyinConverter:
         rule_path = PhonePieceConfig.data_path / 'pinyin2ipa.txt'
         self.rules = PinyinRules([rule_path])
         self.ipa = read_ipa()
+        self.cmn_inventory = read_inventory('cmn')
 
     def convert(self, text):
         pinyin = self.rules.apply(text)
-        return self.ipa.tokenize(pinyin)
+        ipas = self.ipa.tokenize(pinyin)
+        phonemes = self.cmn_inventory.remap(ipas, broad=True)
+        return phonemes
 
 
 class RuleFileError(Exception):

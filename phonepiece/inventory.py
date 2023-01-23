@@ -165,16 +165,17 @@ class Inventory:
         :rtype: str
         """
 
-        # special handling for :
-        if phone.endswith('ː') and phone[:-1] in self.phone.unit_to_id:
-            self.phone_nearest_mapping[phone] = phone[:-1]
-            return phone[:-1]
-
         if phone in self.phone_nearest_mapping:
             nearest_phone = self.phone_nearest_mapping[phone]
+        elif phone in self.phone.unit_to_id:
+            self.phone_nearest_mapping[phone] = phone
+            nearest_phone = phone
+        elif phone.endswith('ː') and phone[:-1] in self.phone.unit_to_id:
+            # special handling for :
+            self.phone_nearest_mapping[phone] = phone[:-1]
+            nearest_phone = phone[:-1]
 
         else:
-
             target_phones = list(self.phone.unit_to_id.keys())[1:-1]
             nearest_phone = self.ipa.most_similar(phone, target_phones, verbose=verbose)
             self.phone_nearest_mapping[phone] = nearest_phone
@@ -192,13 +193,18 @@ class Inventory:
         :rtype: str
         """
 
-        # special handling for :
-        if phoneme.endswith('ː') and phoneme[:-1] in self.phoneme.unit_to_id:
-            self.nearest_mapping[phoneme] = phoneme[:-1]
-            return phoneme[:-1]
-
         if phoneme in self.nearest_mapping:
+            # check cache first
             nearest_phoneme = self.nearest_mapping[phoneme]
+
+        elif phoneme in self.phoneme.unit_to_id:
+            nearest_phoneme = phoneme
+            self.nearest_mapping[phoneme] = phoneme
+
+        elif phoneme.endswith('ː') and phoneme[:-1] in self.phoneme.unit_to_id:
+            # special handling for :
+            self.nearest_mapping[phoneme] = phoneme[:-1]
+            nearest_phoneme = phoneme[:-1]
 
         else:
 
