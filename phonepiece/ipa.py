@@ -20,6 +20,12 @@ _norm_rules = [
     ('ˈ', ''),
     ('tʃ', 't͡ʃ'),
     ('dʒ','d͡ʒ'),
+    # tones: ˩˨˧˦˥
+    ('˩', ''),
+    ('˨', ''),
+    ('˧', ''),
+    ('˦', ''),
+    ('˥', ''),
 ]
 
 # singleton
@@ -162,6 +168,7 @@ class IPA:
         return ''
 
     def tokenize(self, orig_phone):
+
         norm_phone = unicodedata.normalize('NFD', orig_phone)
 
         # normalize some easy mistakes
@@ -181,7 +188,7 @@ class IPA:
 
             if longest_len != -1:
                 subphone = phone[i:i+longest_len]
-                res.append(subphone)
+                res.append(unicodedata.normalize('NFC', subphone))
                 i += len(subphone)
             else:
                 i += 1
