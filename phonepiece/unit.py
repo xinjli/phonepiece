@@ -56,6 +56,10 @@ def create_unit(unit_lst):
     for i, unit in enumerate(sorted(unit_lst)):
         unit_to_id[unit] = i+1
 
+    if '<eos>' not in unit_to_id:
+        eos_id = len(unit_to_id)
+        unit_to_id['<eos>'] = eos_id
+
     unit = Unit(unit_to_id)
     return unit
 

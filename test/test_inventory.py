@@ -1,5 +1,5 @@
 import unittest
-from phonepiece.inventory import read_inventory
+from phonepiece.inventory import read_inventory, create_inventory
 
 
 class TestInventory(unittest.TestCase):
@@ -27,3 +27,10 @@ class TestInventory(unittest.TestCase):
 
             for phoneme in inv.phoneme2phone.keys():
                 self.assertTrue(phone in inv.phoneme)
+
+
+    def test_create_inventory(self):
+
+        inv = create_inventory('eng', ['a', 'b', 'c'])
+        self.assertEqual(len(inv.phoneme), 5)
+        self.assertEqual(len(inv.phone), 5)

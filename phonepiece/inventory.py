@@ -1,5 +1,5 @@
 from phonepiece.config import *
-from phonepiece.unit import read_unit, write_unit
+from phonepiece.unit import read_unit, write_unit, create_unit
 from phonepiece.ipa import read_ipa
 from phonepiece.iso import normalize_lang_id
 from collections import defaultdict
@@ -17,8 +17,18 @@ def read_inventory(lang_id_or_path, model_name='latest'):
     """
 
     if Path(lang_id_or_path).exists():
-        lang_dir = Path(lang_id_or_path)
+        lang_dir = Path(lang_id_or_path).resolve()
         lang_id = lang_dir.stem
+
+        model_name = 'customized'
+
+        # extract lang_id automatically
+        if lang_id == 'inventory':
+            lang_id = lang_dir.parent.stem
+
+            if len(lang_id) != 2 and len(lang_id) != 3:
+                lang_id = 'unknown'
+
     else:
         # load or download lang dir
         assert len(lang_id_or_path) == 2 or len(lang_id_or_path) == 3
@@ -26,8 +36,8 @@ def read_inventory(lang_id_or_path, model_name='latest'):
         lang_id = lang_id_or_path
         lang_dir = load_lang_dir(lang_id, model_name)
 
-    # normalize language id (e.g: 2 char 639-1 -> 3 char 639-3)
-    lang_id = normalize_lang_id(lang_id)
+        # normalize language id (e.g: 2 char 639-1 -> 3 char 639-3)
+        lang_id = normalize_lang_id(lang_id)
 
     phone_unit = read_unit(lang_dir / 'phone.txt')
     phoneme_unit = read_unit(lang_dir / 'phoneme.txt')
@@ -77,6 +87,43 @@ def write_inventory(inv, inv_path):
     w.close()
 
 
+def create_inventory(lang_id, phoneme_lst):
+    """
+    a simple interfact to create an customized inventory from a phoneme set.
+    Assume each phoneme is realized by the same phone
+
+    :param lang_id:
+    :type lang_id: str
+    :param phoneme_lst:
+    :type phoneme_lst:
+    :return:
+    :rtype:
+    """
+
+    phoneme_lst = sorted(list(phoneme_lst))
+    phoneme_unit = create_unit(phoneme_lst)
+    phone_unit = create_unit(phoneme_lst)
+
+    phone2phoneme = defaultdict(list)
+    phoneme2phone = defaultdict(list)
+
+    for phoneme in phoneme_lst:
+        phone2phoneme[phoneme] = [phoneme]
+        phoneme2phone[phoneme] = [phoneme]
+
+
+    # blk and eos would be considered as phone/phonemes as well
+    phone2phoneme['<blk>'] = ['<blk>']
+    phone2phoneme['<eos>'] = ['<eos>']
+    phoneme2phone['<blk>'] = ['<blk>']
+    phoneme2phone['<eos>'] = ['<eos>']
+
+    model_name = 'customized'
+
+    return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
+
+
+
 def is_inventory_available(lang_id, model_name='latest'):
 
     # check whether a customized path is used or not
@@ -95,13 +142,13 @@ class Inventory:
         self.phone = phone
         self.phone2phoneme = phone2phoneme
         self.phoneme2phone = phoneme2phone
-
+        self.model_name = model_name
         self.ipa = read_ipa()
         self.nearest_mapping = dict()
         self.phone_nearest_mapping = dict()
 
     def __str__(self):
-        return f"<Inventory {self.lang_id} phoneme: {len(self.phoneme)}, phone: {len(self.phone)}>"
+        return f"<Inventory {self.lang_id} ({self.model_name}) phoneme: {len(self.phoneme)}, phone: {len(self.phone)}>"
 
     def __repr__(self):
         return self.__str__()
