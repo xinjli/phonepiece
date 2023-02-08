@@ -5,7 +5,8 @@ from phonepiece.iso import normalize_lang_id
 from collections import defaultdict
 from phonepiece.utils import load_lang_dir
 
-def read_inventory(lang_id_or_path, model_name='latest'):
+
+def read_inventory(lang_id_or_path, model_name='latest', base=False):
     """
     read inventory of the lang_id from a prebuilt inventory model or a customized local path
 
@@ -39,10 +40,18 @@ def read_inventory(lang_id_or_path, model_name='latest'):
         # normalize language id (e.g: 2 char 639-1 -> 3 char 639-3)
         lang_id = normalize_lang_id(lang_id)
 
-    phone_unit = read_unit(lang_dir / 'phone.txt')
+    ipa = None
+
+    if not base:
+        phone_unit = read_unit(lang_dir / 'phone.txt')
+    else:
+        ipa = read_ipa()
+        phone_unit = create_unit(ipa.base_phones)
+
     phoneme_unit = read_unit(lang_dir / 'phoneme.txt')
     phone2phoneme = defaultdict(list)
     phoneme2phone = defaultdict(list)
+
 
     # use allophone file if allovera supports it
     for line in open(lang_dir / 'allophone.txt', encoding='utf-8'):
@@ -50,6 +59,9 @@ def read_inventory(lang_id_or_path, model_name='latest'):
         phoneme = fields[0]
 
         for phone in fields[1:]:
+            if base:
+                phone = ipa.compute_base_phone(phone)
+
             phone2phoneme[phone].append(phoneme)
             phoneme2phone[phoneme].append(phone)
 

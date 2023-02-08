@@ -74,7 +74,7 @@ def read_ipa():
             phone = unicodedata.normalize('NFD', row[0])
             base_phones.append(phone)
 
-    ipa = IPA(phone2feature, weights, set(base_phones))
+    ipa = IPA(phone2feature, weights, base_phones)
     return ipa
 
 
@@ -83,10 +83,11 @@ class IPA:
     def __init__(self, phone2feature, weights, base_phones):
         self.phone2feature = phone2feature
         self.weights = weights
-        self.base_phones = base_phones
+        self.base_phones = sorted(base_phones)
+        self.base_phones_set = set(base_phones)
 
         self.canonical_phone = {}
-        self.compute_canoncial_form()
+        self.compute_canonical_form()
 
     def __getitem__(self, item):
         item = self.normalize(item)
@@ -103,7 +104,7 @@ class IPA:
     def read_feature(self, item):
         return self.__getitem__(item)
 
-    def compute_canoncial_form(self):
+    def compute_canonical_form(self):
         phone_idx = defaultdict(list)
 
         power = np.array([2**i for i in range(24)])
@@ -124,7 +125,7 @@ class IPA:
                 min_phone = None
 
                 for phone in phones:
-                    if phone in self.base_phones:
+                    if phone in self.base_phones_set:
                         canonical_form = phone
                         break
                     else:
@@ -244,3 +245,6 @@ class IPA:
                     min_distance = distance
 
         return max_phone
+
+    def compute_base_phone(self, target_phone):
+        return self.most_similar(target_phone, self.base_phones)

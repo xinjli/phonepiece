@@ -35,3 +35,8 @@ class TestIPA(unittest.TestCase):
 
         # remove tones symbols
         self.assertEqual(ipa.tokenize('ʔɓaːn˧˧') , ['ʔ', 'ɓ', 'aː', 'n'])
+
+        # normalizing into the base forms
+        self.assertEqual(ipa.compute_base_phone('a'), 'a')
+        self.assertEqual(ipa.compute_base_phone('tː'), 't')
+
