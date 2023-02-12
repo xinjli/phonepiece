@@ -17,6 +17,10 @@ def read_inventory(lang_id_or_path, model_name='latest', base=False):
     :rtype:
     """
 
+    # special handling for 'ipa' id, which returns a language-independent standard ipa set
+    if lang_id_or_path == 'ipa':
+        return read_ipa_inventory()
+
     if Path(lang_id_or_path).exists():
         lang_dir = Path(lang_id_or_path).resolve()
         lang_id = lang_dir.stem
@@ -70,6 +74,25 @@ def read_inventory(lang_id_or_path, model_name='latest', base=False):
     phone2phoneme['<eos>'] = ['<eos>']
     phoneme2phone['<blk>'] = ['<blk>']
     phoneme2phone['<eos>'] = ['<eos>']
+
+    return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
+
+
+def read_ipa_inventory():
+    lang_id = 'ipa'
+    model_name = 'ipa_base'
+
+    ipa = read_ipa()
+
+    phone_unit = create_unit(ipa.base_phones)
+    phoneme_unit = create_unit(ipa.base_phones)
+
+    phone2phoneme = defaultdict(list)
+    phoneme2phone = defaultdict(list)
+
+    for phone in phone_unit.elems:
+        phone2phoneme[phone].append(phone)
+        phoneme2phone[phone].append(phone)
 
     return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
 
