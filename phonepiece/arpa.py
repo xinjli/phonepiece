@@ -15,7 +15,7 @@ class ArpaConverter:
         arpa_path = PhonePieceConfig.data_path / 'arpabet.csv'
 
         self.arpa_map = {}
-        with open(arpa_path, 'r') as f:
+        with open(arpa_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)
             for arpa, ipa in reader:
                 self.arpa_map[arpa] = ipa.strip().split()

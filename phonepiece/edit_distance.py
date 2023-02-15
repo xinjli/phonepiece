@@ -296,7 +296,7 @@ def analyze_group_edit_distance(ans_path, hyp_path, grp_path):
     grp_err = dict()
     grp_cnt = dict()
 
-    for line in open(ans_path):
+    for line in open(ans_path, 'r', encoding='utf-8'):
         utt_id, sent = line.split(' ', 1)
         words = sent.split()
 
@@ -306,7 +306,7 @@ def analyze_group_edit_distance(ans_path, hyp_path, grp_path):
         ans[utt_id] = words
 
 
-    for line in open(hyp_path):
+    for line in open(hyp_path, 'r', encoding='utf-8'):
         utt_id, sent = line.split(' ', 1)
         words = sent.split()
 
@@ -315,7 +315,7 @@ def analyze_group_edit_distance(ans_path, hyp_path, grp_path):
 
         hyp[utt_id] = words
 
-    for i, line in enumerate(open(grp_path)):
+    for i, line in enumerate(open(grp_path, 'r', encoding='utf-8')):
         phonemes = line.split()
 
         for phone in phonemes:

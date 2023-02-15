@@ -1,4 +1,5 @@
 from iso639 import languages
+from phonepiece.tree import read_tree
 
 # map macro lang to its individual lang with the largest population or simply the first child entry on Wikipedia
 _macro_to_individual = {
@@ -30,3 +31,9 @@ def normalize_lang_id(lang_id):
     if iso3 in _macro_to_individual:
         return _macro_to_individual[iso3]
     return iso3
+
+def read_all_langs():
+
+    tree = read_tree()
+    iso_lst = list(tree.iso2path.keys())
+    return iso_lst

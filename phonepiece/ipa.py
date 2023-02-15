@@ -43,7 +43,7 @@ def read_ipa():
 
     phone2feature = {}
 
-    with open(feature_file) as csvfile:
+    with open(feature_file, 'r', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
 
         # This skips the first row of the CSV file.
@@ -64,7 +64,7 @@ def read_ipa():
 
     base_phone_file = PhonePieceConfig.data_path / f'ipa_base.csv'
     base_phones = []
-    with open(base_phone_file) as csvfile:
+    with open(base_phone_file, 'r', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
 
         # This skips the first row of the CSV file.

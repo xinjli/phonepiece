@@ -31,7 +31,7 @@ def read_lexicon(lang_id, model_name='latest'):
         return Lexicon(lang_id, inventory, {})
 
     word2phoneme = {}
-    for line in open(str(lexicon_path), 'r'):
+    for line in open(str(lexicon_path), 'r', encoding='utf-8'):
         fields = line.strip().split('\t')
 
         # wrongly formatted lines

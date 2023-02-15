@@ -8,7 +8,7 @@ def read_tree():
 
     iso2path = {}
 
-    for line in open(PhonePieceConfig.data_path / 'tree.txt', 'r'):
+    for line in open(PhonePieceConfig.data_path / 'tree.txt', 'r', encoding='utf-8'):
         fields = line.strip().split()
         iso = fields[0]
         path = fields[1].split('/')[1:]

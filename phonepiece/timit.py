@@ -11,7 +11,7 @@ class TIMITConverter:
 
         self.timit_map = {}
 
-        with open(timit_path, 'r') as f:
+        with open(timit_path, 'r', encoding='utf-8') as f:
             for line in f:
                 fields = line.strip().split()
 

@@ -114,7 +114,7 @@ def write_inventory(inv, inv_path):
 
             allophone[phoneme].append(k)
 
-    w = open(inv_path / 'allophone.txt', 'w')
+    w = open(inv_path / 'allophone.txt', 'w', encoding='utf-8')
 
     for phoneme in inv.phoneme.elems[1:-1]:
         w.write(phoneme+' '+' '.join(allophone[phoneme])+'\n')
