@@ -52,7 +52,7 @@ class ArpaConverter:
 
         normalized_ipa = []
         for ipa in ipa_lst:
-            normalized_ipa.append(self.ipa.most_similar(ipa, list(self.ipa_set)))
+            normalized_ipa.append(self.ipa.most_similar(ipa, sorted(list(self.ipa_set))))
 
         arpa_lst = []
 

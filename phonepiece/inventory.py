@@ -66,8 +66,11 @@ def read_inventory(lang_id_or_path, model_name='latest', base=False):
             if base:
                 phone = ipa.compute_base_phone(phone)
 
-            phone2phoneme[phone].append(phoneme)
-            phoneme2phone[phoneme].append(phone)
+            if phoneme not in phone2phoneme[phone]:
+                phone2phoneme[phone].append(phoneme)
+
+            if phone not in phoneme2phone[phoneme]:
+                phoneme2phone[phoneme].append(phone)
 
     # blk and eos would be considered as phone/phonemes as well
     phone2phoneme['<blk>'] = ['<blk>']
