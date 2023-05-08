@@ -96,9 +96,9 @@ defaultdict(list,
              '<eos>': ['<eos>']})
 ```
 
-### Phonetics Utilities
+### Phone Tokenization
 
-This lib also provides a few phonetics utilities, for example, IPA manipulations
+This lib also provides a tokenizer which splits a concatenated IPA string into separate IPAs
 
 ```python
 In [1]: from phonepiece.ipa import read_ipa                                                         
@@ -107,9 +107,37 @@ In [2]: ipa = read_ipa()
 
 In [3]: ipa.tokenize('kʰæt')                                                                        
 Out[3]: ['kʰ', 'æ', 't']
+```
 
-In [4]: ipa.similarity('a', 'e')                                                                    
-Out[4]: 0.9655172413793104
+### Phonological Distance
+
+The `phonological_distance` is an augmented edit distance, it takes phonological distance into account as well.
+
+```python
+In [1]: from phonepiece.distance import phonological_distance
+
+In [2]: phonological_distance('a', 'b')
+Out[2]: 0.5862068965517241
+
+In [3]: phonological_distance('a', 'e')
+Out[3]: 0.03448275862068961
+
+In [4]: phonological_distance('a', 'bc')
+Out[4]: 1.5862068965517242
+```
+
+### Lexicon Lookup
+
+It also includes many lexicon dictionaries, you can look up pronunciation of a particular word (if it exists)
+The output phonemes are consistent with its language's inventory phoneme space
+
+```
+In [1]: from phonepiece.lexicon import read_lexicon
+
+In [2]: eng = read_lexicon('eng')
+
+In [3]: eng['hello']
+Out[3]: ['h', 'ʌ', 'l', 'o', 'w']
 ```
 
 ## Models

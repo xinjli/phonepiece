@@ -1,4 +1,4 @@
-from phonepiece.iso import normalize_lang_id
+from phonepiece.lang import normalize_lang_id
 from phonepiece.config import PhonePieceConfig
 from collections import defaultdict
 import unicodedata

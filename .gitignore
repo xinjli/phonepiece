@@ -135,3 +135,4 @@ scripts/
 notes/
 phonepiece/data/model
 sandbox/
+.DS_Store

@@ -1,7 +1,9 @@
 from collections import defaultdict
 from phonepiece.utils import load_lang_dir
-from phonepiece.iso import normalize_lang_id
+from phonepiece.lang import normalize_lang_id
 from phonepiece.inventory import read_inventory
+from phonepiece.utils import import_with_auto_install
+from phonepiece.arpa import ArpaConverter
 
 
 def read_lexicon(lang_id, model_name='latest'):
@@ -26,8 +28,21 @@ def read_lexicon(lang_id, model_name='latest'):
 
     lexicon_path = lang_dir / 'lexicon.txt'
 
-    # empty lexicon
-    if not lexicon_path.exists():
+    # special handling for English
+    if lang_id == 'eng':
+        cmudict_module = import_with_auto_install('cmudict', 'cmudict')
+        cmudict = cmudict_module.dict()
+        converter = ArpaConverter()
+        word2phoneme = {}
+        for word in cmudict:
+            arpa = cmudict[word][0]
+            ipas = converter.convert(arpa)
+            word2phoneme[word] = ipas
+
+        return Lexicon(lang_id, inventory, word2phoneme)
+
+    elif not lexicon_path.exists():
+        # empty lexicon
         return Lexicon(lang_id, inventory, {})
 
     word2phoneme = {}

@@ -20,6 +20,7 @@ _norm_rules = [
     ('ˈ', ''),
     ('tʃ', 't͡ʃ'),
     ('dʒ','d͡ʒ'),
+    ('N', 'n'), # special handling for JPN N
     # tones: ˩˨˧˦˥
     ('˩', ''),
     ('˨', ''),
@@ -141,7 +142,6 @@ class IPA:
                 for phone in phones:
                     self.canonical_phone[phone] = canonical_form
 
-
     def normalize(self, orig_phone):
         norm_phone = unicodedata.normalize('NFD', orig_phone)
 
@@ -216,6 +216,11 @@ class IPA:
         f2 = self.phone2feature[p2]
 
         return 1.0 - np.sum(np.abs(f1 - f2) * self.weights) / np.sum(self.weights) / 2.0
+
+
+    def distance(self, p1, p2):
+        return 1.0 - self.similarity(p1, p2)
+
 
     def most_similar(self, target_phone, phone_cands, verbose=False):
 

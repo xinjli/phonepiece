@@ -1,7 +1,7 @@
 from phonepiece.config import *
 from phonepiece.unit import read_unit, write_unit, create_unit
 from phonepiece.ipa import read_ipa
-from phonepiece.iso import normalize_lang_id
+from phonepiece.lang import normalize_lang_id
 from collections import defaultdict
 from phonepiece.utils import load_lang_dir
 

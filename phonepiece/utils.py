@@ -1,6 +1,15 @@
 from phonepiece.config import *
 from phonepiece.bin.download_model import download_model
-from phonepiece.iso import normalize_lang_id
+from phonepiece.lang import normalize_lang_id
+import pip
+import importlib
+
+def import_with_auto_install(package, package_name):
+    try:
+        return importlib.import_module(package)
+    except ImportError:
+        pip.main(['install', package_name])
+    return importlib.import_module(package)
 
 
 def load_lang_dir(lang_id, model_name='latest'):
@@ -33,6 +42,7 @@ def load_lang_dir(lang_id, model_name='latest'):
             download_model(model_name)
 
         if not lang_dir.exists():
-            raise ValueError(f"could not download or read {model_name} inventory")
+            print(f"warning: could not download or read {lang_id} inventory, using eng instead")
+            lang_dir = PhonePieceConfig.data_path / 'model' / model_name / 'eng'
 
     return lang_dir

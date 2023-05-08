@@ -1,4 +1,6 @@
 import sys
+from phonepiece.ipa import read_ipa
+import editdistance
 
 def print_result(string_lst, out=None):
 
@@ -42,10 +44,6 @@ def fuzzy_match(pattern, text):
             index_b = i-1
             cost = 0 if string_a[index_a] == string_b[index_b] else 1
 
-            dx = 0
-            dy = 0
-            mincost = 0
-
             if dp[i-1][j][0] < dp[i][j-1][0]:
                 dx = -1
                 dy = 0
@@ -88,6 +86,9 @@ def fuzzy_match(pattern, text):
     best_end_index -= 1
 
     return mincost, best_start_index, best_end_index
+
+def fast_edit_distance(string_a, string_b):
+    return editdistance.distance(string_a, string_b)
 
 def edit_distance(string_a, string_b, utt_id='utt_id', verbose=False, out=None):
 
@@ -178,8 +179,10 @@ def edit_distance(string_a, string_b, utt_id='utt_id', verbose=False, out=None):
 
         if out is None:
             out = sys.stdout
+
         out.write("-"*80+'\n')
-        out.write(f"UTT: {utt_id} - add {add_cnt}, del {del_cnt}, sub {sub_cnt}\n")
+        out.write(f"UTT: {utt_id}\n")
+        out.write(f"ERR {dp[len_b][len_a]}: ADD {add_cnt}, DEL {del_cnt}, SUB {sub_cnt}\n")
         hyp_lst.append("HYP: ")
         ref_lst.append("REF: ")
         ops_lst.append("OPS: ")
@@ -195,7 +198,42 @@ def edit_distance(string_a, string_b, utt_id='utt_id', verbose=False, out=None):
     return dp[len_b][len_a], add_cnt, del_cnt, sub_cnt, add_lst, del_lst, sub_lst
 
 
-def wer(string_a, string_b):
+def phonological_distance(string_a, string_b):
+
+    if ' '  in string_a:
+        string_a = string_a.split(' ')
+
+    if ' ' in string_b:
+        string_b = string_b.split(' ')
+
+    ipa = read_ipa()
+
+    # length of each string
+    len_a = len(string_a)
+    len_b = len(string_b)
+
+    # dp table
+    dp = [[0 for x in range(len_a+1)] for y in range(len_b+1)]
+
+    # initialize first row and first column
+    for i in range(len_a+1):
+        dp[0][i] = i
+
+    for i in range(len_b+1):
+        dp[i][0] = i
+
+    # dp update
+    for i in range(1, len_b+1):
+        for j in range(1, len_a+1):
+            index_a = j-1
+            index_b = i-1
+            sub_cost = ipa.distance(string_a[index_a], string_b[index_b])
+            dp[i][j] = min(dp[i-1][j-1]+sub_cost, min(dp[i-1][j]+1, dp[i][j-1]+1))
+
+    return dp[len_b][len_a]
+
+
+def naive_edit_distance(string_a, string_b):
 
     # length of each string
     len_a = len(string_a)
@@ -220,7 +258,6 @@ def wer(string_a, string_b):
             dp[i][j] = min(dp[i-1][j-1]+cost, min(dp[i-1][j]+1, dp[i][j-1]+1))
 
     return dp[len_b][len_a]
-
 
 
 def group_edit_distance(string_b, string_a, grp_dict, grp_err, grp_cnt):
