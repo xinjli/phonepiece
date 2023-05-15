@@ -5,23 +5,8 @@ import argparse
 from tqdm import tqdm
 from collections import Counter
 
-if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Read the contents of two files.')
-    parser.add_argument( '--hyp', help='the path to the hypothesis file')
-    parser.add_argument('--ref', help='the path to the reference file')
-    parser.add_argument('-f', '--format', default='kaldi', help='kaldi or text')
-    parser.add_argument('-o', '--output', help='the path to the reference file')
-    parser.add_argument('-v', '--verbose', type=bool ,default=False)
-
-    args = parser.parse_args()
-    output = args.output
-    ref = args.ref
-    hyp = args.hyp
-    verbose = args.verbose
-    file_format = args.format
-
-    assert file_format in ['kaldi', 'text']
+def eval_distance(hyp, ref, output=None, file_format='kaldi', verbose=True, return_counter=False):
 
     w = None
     if output is not None:
@@ -51,7 +36,7 @@ if __name__ == '__main__':
     del_counter = Counter()
     sub_counter = Counter()
 
-    for i, line in tqdm(enumerate(open(hyp, 'r').readlines())):
+    for i, line in enumerate(tqdm(open(hyp, 'r').readlines())):
         fields = line.strip().split()
 
         if file_format == 'kaldi':
@@ -86,9 +71,9 @@ if __name__ == '__main__':
         tot_len_cnt += all_cnt
 
     print(f"------------------------------------")
-    print(f"TOTAL ERR: {tot_err_cnt}\n")
-    print(f"TOTAL DST: {tot_dst_cnt}\n")
-    print(f"TOTAL LEN: {tot_len_cnt}\n")
+    print(f"TOTAL ERR: {tot_err_cnt}")
+    print(f"TOTAL DST: {tot_dst_cnt:.3f}")
+    print(f"TOTAL LEN: {tot_len_cnt}")
 
     if verbose:
         print(f"TOTAL ADD {tot_add_cnt:.3f}: {add_counter.most_common(10)}")
@@ -128,3 +113,38 @@ if __name__ == '__main__':
 
         w.write(f"------------------------------------\n")
         w.close()
+
+    err_rate = 0
+    if tot_len_cnt != 0:
+        err_rate = tot_err_cnt/tot_len_cnt
+
+    dst_rate = 0
+    if tot_len_cnt != 0:
+        dst_rate = tot_dst_cnt/tot_len_cnt
+
+    if return_counter:
+        return (err_rate, dst_rate, add_counter, del_counter, sub_counter)
+    else:
+        return (err_rate, dst_rate)
+
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Read the contents of two files.')
+    parser.add_argument( '--hyp', help='the path to the hypothesis file')
+    parser.add_argument('--ref', help='the path to the reference file')
+    parser.add_argument('-f', '--format', default='kaldi', help='kaldi or text')
+    parser.add_argument('-o', '--output', help='the path to the reference file')
+    parser.add_argument('-v', '--verbose', type=bool ,default=True)
+
+    args = parser.parse_args()
+    output = args.output
+    ref = args.ref
+    hyp = args.hyp
+    verbose = args.verbose
+    file_format = args.format
+
+    assert file_format in ['kaldi', 'text']
+
+    eval_distance(hyp, ref, output, file_format=file_format, verbose=verbose)

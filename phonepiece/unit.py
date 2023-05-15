@@ -47,6 +47,12 @@ def write_unit(unit, unit_path):
 
 def create_unit(unit_lst):
 
+    if '<blk>' in unit_lst:
+        unit_lst.remove('<blk>')
+
+    if '<eos>' in unit_lst:
+        unit_lst.remove('<eos>')
+
     unit_to_id = dict()
 
     unit_to_id['<blk>'] = 0

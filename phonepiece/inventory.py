@@ -125,7 +125,7 @@ def write_inventory(inv, inv_path):
     w.close()
 
 
-def create_inventory(lang_id, phoneme_lst):
+def create_inventory(lang_id, phoneme_lst_or_phoneme2phone):
     """
     a simple interfact to create an customized inventory from a phoneme set.
     Assume each phoneme is realized by the same phone
@@ -138,28 +138,79 @@ def create_inventory(lang_id, phoneme_lst):
     :rtype:
     """
 
-    phoneme_lst = sorted(list(phoneme_lst))
-    phoneme_unit = create_unit(phoneme_lst)
-    phone_unit = create_unit(phoneme_lst)
+    if isinstance(phoneme_lst_or_phoneme2phone, list):
 
-    phone2phoneme = defaultdict(list)
+        phoneme_lst = phoneme_lst_or_phoneme2phone
+
+        phoneme_lst = sorted(list(phoneme_lst))
+        phoneme_unit = create_unit(phoneme_lst)
+        phone_unit = create_unit(phoneme_lst)
+
+        phone2phoneme = defaultdict(list)
+        phoneme2phone = defaultdict(list)
+
+        for phoneme in phoneme_lst:
+            phone2phoneme[phoneme] = [phoneme]
+            phoneme2phone[phoneme] = [phoneme]
+
+        # blk and eos would be considered as phone/phonemes as well
+        phone2phoneme['<blk>'] = ['<blk>']
+        phone2phoneme['<eos>'] = ['<eos>']
+        phoneme2phone['<blk>'] = ['<blk>']
+        phoneme2phone['<eos>'] = ['<eos>']
+
+        model_name = 'customized'
+
+        return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
+
+    else:
+        assert isinstance(phoneme_lst_or_phoneme2phone, dict)
+
+        phoneme2phone = phoneme_lst_or_phoneme2phone
+        phoneme_lst = sorted(list(phoneme2phone.keys()))
+        phoneme_unit = create_unit(phoneme_lst)
+
+        phone2phoneme = defaultdict(list)
+
+        for phoneme, phone_lst in phoneme2phone.items():
+            for phone in phone_lst:
+                phone2phoneme[phone].append(phoneme)
+
+        phone_lst = sorted(list(phone2phoneme.keys()))
+        phone_unit = create_unit(phone_lst)
+
+        model_name = 'customized'
+
+        phone2phoneme['<blk>'] = ['<blk>']
+        phone2phoneme['<eos>'] = ['<eos>']
+        phoneme2phone['<blk>'] = ['<blk>']
+        phoneme2phone['<eos>'] = ['<eos>']
+
+        return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
+
+
+def create_inventory_from_phone2phoneme(lang_id, phone2phoneme):
+
+    phone_lst = sorted(list(phone2phoneme.keys()))
+    phone_unit = create_unit(phone_lst)
+
     phoneme2phone = defaultdict(list)
 
-    for phoneme in phoneme_lst:
-        phone2phoneme[phoneme] = [phoneme]
-        phoneme2phone[phoneme] = [phoneme]
+    for phone, phoneme_lst in phone2phoneme.items():
+        for phoneme in phoneme_lst:
+            phoneme2phone[phoneme].append(phone)
 
+    phoneme_lst = sorted(list(phoneme2phone.keys()))
+    phoneme_unit = create_unit(phoneme_lst)
 
-    # blk and eos would be considered as phone/phonemes as well
+    model_name = 'customized'
+
     phone2phoneme['<blk>'] = ['<blk>']
     phone2phoneme['<eos>'] = ['<eos>']
     phoneme2phone['<blk>'] = ['<blk>']
     phoneme2phone['<eos>'] = ['<eos>']
 
-    model_name = 'customized'
-
     return Inventory(lang_id, model_name, phoneme_unit, phone_unit, phone2phoneme, phoneme2phone)
-
 
 
 def is_inventory_available(lang_id, model_name='latest'):

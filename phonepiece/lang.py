@@ -37,6 +37,12 @@ def normalize_lang_id(lang_id):
         return _macro_to_individual[iso3]
     return iso3
 
+def read_lang_name(lang_id):
+    lang_id = normalize_lang_id(lang_id)
+    language = languages.get(part3=lang_id)
+    return language.name
+
+
 def read_all_langs():
 
     tree = read_tree()

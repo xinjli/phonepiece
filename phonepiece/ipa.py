@@ -6,6 +6,7 @@ from collections import defaultdict
 
 _norm_rules = [
     (':', 'ː'),
+    ('g', 'ɡ'),
     ("ɡ̥", "k"),
     ('g', 'q̠'),
     ('d̥', "t"),
@@ -20,7 +21,7 @@ _norm_rules = [
     ('ˈ', ''),
     ('tʃ', 't͡ʃ'),
     ('dʒ','d͡ʒ'),
-    ('N', 'n'), # special handling for JPN N
+    ('N', 'ɴ'), # special handling for JPN N
     # tones: ˩˨˧˦˥
     ('˩', ''),
     ('˨', ''),
