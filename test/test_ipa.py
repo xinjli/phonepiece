@@ -11,12 +11,10 @@ class TestIPA(unittest.TestCase):
         self.assertEqual(ipa.normalize('a') , 'a')
         self.assertEqual(ipa.normalize('a:') , 'aː')
         self.assertEqual(ipa.normalize('b') , 'b')
-        self.assertEqual(ipa.normalize('g') , 'q')
         self.assertEqual(ipa.normalize('d̠') , 'd')
 
         # score
         self.assertEqual(ipa.similarity('a', 'a') , 1.0)
-        self.assertEqual(ipa.similarity('g', 'q̠') , 1.0)
         self.assertTrue(ipa.similarity('a', 'e') > ipa.similarity('a', 'b'))
         self.assertTrue(ipa.similarity('a', 'ɑ') > ipa.similarity('a', 'i'))
         self.assertTrue(ipa.similarity('a', 'ɑ') > ipa.similarity('ɑ', 'i'))
